@@ -49,6 +49,14 @@ class SwiftWebpackPlugin {
 
   _compile() {
     log(`Compiling '${this.target}'`)
+    try {
+      fs.mkdirSync(this.dist);
+    } catch (e) {
+      if (e.code !== "EEXIST") {
+        throw e;
+      }
+    }
+
     const options = {
       cwd: this.packageDirectory,
     }
