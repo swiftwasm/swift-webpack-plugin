@@ -1,0 +1,11 @@
+{
+  "name": "@swiftwasm/swift-webpack-plugin",
+  "version": "1.0.0",
+  "description": "webpack plugin for Swift",
+  "main": "plugin.js",
+  "author": "Yuta Saito",
+  "license": "MIT",
+  "dependencies": {
+    "watchpack": "^1.6.1"
+  }
+}
