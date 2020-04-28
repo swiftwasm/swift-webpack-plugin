@@ -34,15 +34,21 @@ class SwiftWebpackPlugin {
     this.target = options.target
     this.dist = options.dist
     this.buildDirectory = path.join(this.packageDirectory, ".build")
+    this.building = false;
+    this.ignoring = [this.buildDirectory, this.dist, ".git", "node_modules"]
     this.wp = new Watchpack({
-      ignored: [this.buildDirectory],
+      ignored: this.ignoring,
     });
   }
   apply(compiler) {
     compiler.hooks.watchRun.tap("SwiftWebpackPlugin", () => {
       log("Watching " + this.packageDirectory)
       this.wp.watch([], [this.packageDirectory], Date.now() - 10000);
-      this.wp.on('change', () => this._compile())
+      this.wp.on('change', (filePath, mtime, explanation) => {
+	if (this.ignoring.some(i => filePath.includes(i)))
+	  return;
+        this._compile()
+      })
     })
     compiler.hooks.compile.tap("SwiftWebpackPlugin", compilation => {
       this._compile();
@@ -50,6 +56,8 @@ class SwiftWebpackPlugin {
   }
 
   _compile() {
+    if (this.building) return;
+    this.building = true;
     log(`Compiling '${this.target}'`)
     try {
       fs.mkdirSync(this.dist);
@@ -78,8 +86,14 @@ class SwiftWebpackPlugin {
           ]
         );
       })
-      .then(() => log(`'${this.target}' has been compiled successfully`))
-      .catch((error) => log(error))
+      .then(() => {
+	log(`'${this.target}' has been compiled successfully`)
+	this.building = false;
+      })
+      .catch((error) => {
+        log(error)
+	this.building = false;
+      })
   }
 }
 
