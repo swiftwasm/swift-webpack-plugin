@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const { spawn } = require('child_process');
 const Watchpack = require('watchpack');
 const log = msg => console.log("[swift-webpack-plugin] ", msg);
@@ -7,20 +8,21 @@ function runProcess(bin, args, options) {
   return new Promise((resolve, reject) => {
     const p = spawn(bin, args, options);
     let errorMessage = "";
+    let output = "";
 
     p.on('close', code => {
       if (code === 0) {
-        resolve();
+        resolve(output);
       } else {
         const cmd = [bin].concat(args).join(" ")
-        reject(new Error(`Failed to execute: ${cmd}\n${errorMessage}`));
+        reject(new Error(`Failed to execute: ${cmd}\n${errorMessage}\n${output}`));
       }
     });
     p.stderr.on('data', (data) => {
-      errorMessage += data.toString() + "\n";
+      errorMessage += data.toString();
     });
     p.stdout.on('data', (data) => {
-      errorMessage += data.toString() + "\n";
+      output += data.toString();
     });
     p.on('error', reject);
   });
@@ -51,6 +53,7 @@ class SwiftWebpackPlugin {
     log(`Compiling '${this.target}'`)
     try {
       fs.mkdirSync(this.dist);
+      log(`Created dist directory '${this.dist}'`)
     } catch (e) {
       if (e.code !== "EEXIST") {
         throw e;
@@ -60,24 +63,23 @@ class SwiftWebpackPlugin {
     const options = {
       cwd: this.packageDirectory,
     }
-    runProcess(
-      "swift",
-      [
-        "build", "--triple", "wasm32-unknown-wasi", "--build-path",
-        this.buildDirectory,
-      ],
-      options
-    ).then(() => {
-      return runProcess(
-        "cp",
-        [
-          path.join(this.buildDirectory, 'debug', this.target),
-          path.join(this.dist, this.target + ".wasm"),
-        ]
-      );
-    }).then(() => {
-      log(`'${this.target}' has been compiled successfully`)
-    }).catch((error) => log(error))
+    const buildArgs = [
+      "build", "--triple", "wasm32-unknown-wasi", "--build-path",
+      this.buildDirectory,
+    ]
+    runProcess("swift", buildArgs, options)
+      .then(() => runProcess("swift", buildArgs.concat(["--show-bin-path"]), options))
+      .then((binPath) => {
+        return runProcess(
+          "cp",
+          [
+            path.join(binPath.slice(0, binPath.length - 1), this.target),
+            path.join(this.dist, this.target + ".wasm"),
+          ]
+        );
+      })
+      .then(() => log(`'${this.target}' has been compiled successfully`))
+      .catch((error) => log(error))
   }
 }
 
