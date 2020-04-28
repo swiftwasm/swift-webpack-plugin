@@ -1,0 +1,1 @@
+# @swiftwasm/swift-webpack-plugin
