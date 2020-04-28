@@ -1,6 +1,6 @@
 {
   "name": "@swiftwasm/swift-webpack-plugin",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "webpack plugin for Swift",
   "main": "plugin.js",
   "author": "Yuta Saito",
