@@ -35,7 +35,7 @@ class SwiftWebpackPlugin {
     this.dist = options.dist
     this.buildDirectory = path.join(this.packageDirectory, ".build")
     this.building = false;
-    this.ignoring = [this.buildDirectory, this.dist, ".git", "node_modules"]
+    this.ignoring = [this.buildDirectory, this.dist, ".git", "node_modules", ".xcodeproj"]
     this.wp = new Watchpack({
       ignored: this.ignoring,
     });
@@ -45,6 +45,7 @@ class SwiftWebpackPlugin {
       log("Watching " + this.packageDirectory)
       this.wp.watch([], [this.packageDirectory], Date.now() - 10000);
       this.wp.on('change', (filePath, mtime, explanation) => {
+        if (!filePath) return;
 	if (this.ignoring.some(i => filePath.includes(i)))
 	  return;
         this._compile()
