@@ -51,7 +51,7 @@ class SwiftWebpackPlugin {
       log("Watching " + this.packageDirectory)
       this.wp.watch([], [this.packageDirectory], Date.now() - 10000);
       this.wp.on('change', (filePath, mtime, explanation) => {
-        if (!filePath) return;
+        if (!filePath || typeof filePath != 'string') return;
         if (this.ignoring.some(i => filePath.includes(i)))
           return;
         this._compile()
