@@ -49,8 +49,8 @@ class SwiftWebpackPlugin {
       this.wp.watch([], [this.packageDirectory], Date.now() - 10000);
       this.wp.on('change', (filePath, mtime, explanation) => {
         if (!filePath) return;
-	if (this.ignoring.some(i => filePath.includes(i)))
-	  return;
+        if (this.ignoring.some(i => filePath.includes(i)))
+          return;
         this._compile()
       })
     })
@@ -92,12 +92,12 @@ class SwiftWebpackPlugin {
         );
       })
       .then(() => {
-	log(`'${this.target}' has been compiled successfully`)
-	this.building = false;
+        log(`'${this.target}' has been compiled successfully`)
+        this.building = false;
       })
       .catch((error) => {
         log(error)
-	this.building = false;
+        this.building = false;
       })
   }
 }
