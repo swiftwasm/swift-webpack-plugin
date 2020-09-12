@@ -34,6 +34,8 @@ class SwiftWebpackPlugin {
     this.target = options.target
     this.dist = options.dist
     this.buildOptions = options.buildOptions
+    if (!this.buildOptions)
+      this.buildOptions = []
     this.config = options.config
     if (!this.config)
       this.config = "debug"
