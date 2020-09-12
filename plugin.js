@@ -41,7 +41,7 @@ class SwiftWebpackPlugin {
       this.config = "debug"
     this.swift_build = options.swift_build
     if (!this.swift_build)
-      this.swift_build = "swift-build"
+      this.swift_build = "swift build"
     this.buildDirectory = path.join(this.packageDirectory, ".build")
     this.building = false;
     this.ignoring = [this.buildDirectory, this.dist, ".git", "node_modules", ".xcodeproj"]
@@ -81,13 +81,16 @@ class SwiftWebpackPlugin {
     const options = {
       cwd: this.packageDirectory,
     }
-    const buildArgs = [
+    const buildCmds = this.swift_build.split(" ")
+    const mainBin = buildCmds[0]
+    const mainArgs = buildCmds.slice(1)
+    const buildArgs = mainArgs.concat([
       "--triple", "wasm32-unknown-wasi",
       "--configuration", this.config,
       "--build-path", this.buildDirectory,
-    ].concat(this.buildOptions)
-    runProcess(this.swift_build, buildArgs, options)
-      .then(() => runProcess(this.swift_build, buildArgs.concat(["--show-bin-path"]), options))
+    ]).concat(this.buildOptions)
+    runProcess(mainBin, buildArgs, options)
+      .then(() => runProcess(mainBin, buildArgs.concat(["--show-bin-path"]), options))
       .then((binPath) => {
         return runProcess(
           "cp",
