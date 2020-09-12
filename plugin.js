@@ -33,6 +33,7 @@ class SwiftWebpackPlugin {
     this.packageDirectory = options.packageDirectory
     this.target = options.target
     this.dist = options.dist
+    this.buildOptions = options.buildOptions
     this.config = options.config
     if (!this.config)
       this.config = "debug"
@@ -82,7 +83,7 @@ class SwiftWebpackPlugin {
       "--triple", "wasm32-unknown-wasi",
       "--configuration", this.config,
       "--build-path", this.buildDirectory,
-    ]
+    ].concat(this.buildOptions)
     runProcess(this.swift_build, buildArgs, options)
       .then(() => runProcess(this.swift_build, buildArgs.concat(["--show-bin-path"]), options))
       .then((binPath) => {
