@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "@swiftwasm/swift-webpack-plugin": "../",
+    "webpack": "^4.16.3",
+    "webpack-cli": "^3.1.0"
+  }
+}
