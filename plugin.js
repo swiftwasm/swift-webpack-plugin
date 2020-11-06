@@ -95,7 +95,7 @@ class SwiftWebpackPlugin {
         return runProcess(
           "cp",
           [
-            path.join(binPath.slice(0, binPath.length - 1), this.target),
+            path.join(binPath.slice(0, binPath.length - 1), this.target + ".wasm"),
             path.join(this.dist, this.target + ".wasm"),
           ]
         );
